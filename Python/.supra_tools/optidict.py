@@ -80,4 +80,4 @@ class node:
         self.next = next
 
     def __str__(self):
-        return f"{self.key} --> {self.value}"
+        return f"{self.key}: {self.value}"
