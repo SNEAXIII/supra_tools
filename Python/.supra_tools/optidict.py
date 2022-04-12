@@ -81,18 +81,3 @@ class node:
 
     def __str__(self):
         return f"{self.key} --> {self.value}"
-
-
-dict_ = optidict()
-
-dict_["sauc"] = "isse"
-dict()
-dict_["coucou"] = "toi"
-dico = {}
-dico["test"] = "test"
-print( dico)
-print(dict_)
-dict_["coucou"] = "caca"
-print(dict_)
-dict_["coucou"] = "bite"
-print(dict_)
