@@ -72,7 +72,6 @@ class optidict:
     def __len__(self):
         return self.len
 
-
 class node:
     def __init__(self, key, value, next=None):
         self.key = key
