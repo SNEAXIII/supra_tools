@@ -2,7 +2,7 @@ from math import sin, cos, pi
 import pygame
 
 class balle:
-    def __init__(self, largeur, hauteur, Barre, Bricks, surface, sons, angle=40, vitesse=20):
+    def __init__(self, largeur, hauteur, Barre, Bricks, surface, sons, angle=40, vitesse=20, change_barre_x = 0):
         self.pi180 = pi / 180
         self.reset(Barre, vitesse, Bricks, angle)
         self.screen_h = hauteur
@@ -11,6 +11,7 @@ class balle:
         self.skins = {"feu" : pygame.image.load(r"textures\ball\fire_bool.png")}
         self.img_base = self.img_act = self.skins["feu"]
         self.Sons = sons
+        self.change_barre_x = change_barre_x
 
     def tp_souris(self):
         self.x, self.y = pygame.mouse.get_pos()
@@ -184,7 +185,7 @@ class balle:
 
     def contact_barre(self, gamma, max0, max1):
         self.calc_coef_barre(gamma, max0, max1)
-        self.Barre.augmente_taile_x(-0.5)
+        self.Barre.augmente_taile_x(self.change_barre_x)
         self.rebond_bas()
         self.Sons.son_balle_barre()
 

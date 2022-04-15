@@ -4,7 +4,7 @@ from barre import barre
 from balls import balle
 from bricks import bricks
 from pygame.locals import *
-from menu import Menu
+from menu import Menu, Menu_Level
 
 """
 pygame.init()
@@ -37,6 +37,7 @@ jeu_ = False # lance le jeu
 level_ = False # lance le menu des niveaux
 """
 
+
 class souris:
     def __init__(self):
         self.press = False
@@ -44,6 +45,7 @@ class souris:
 
     def position(self):
         self.pos = pygame.mouse.get_pos()
+
 
 class jeu:
     def __init__(self):
@@ -55,9 +57,10 @@ class jeu:
         self.hauteur_ecran = 720
         self.surface = pygame.display.set_mode((self.largeur_ecran, self.hauteur_ecran))
         self.angle_base = 45
-        self.font = pygame.font.SysFont('Linux Biolinum G',55)
+        self.font = pygame.font.SysFont('Linux Biolinum G', 55)
         self.Son_Jeu = son_jeu()
-        self.menu = Menu(self.surface,self.font,souris())
+        self.menu = Menu(self.surface, self.font, souris())
+        self.menu_niveau = Menu_Level(self.surface, self.font, souris())
         self.reset()
 
     def reset(self):
@@ -71,18 +74,18 @@ class jeu:
         self.fpsClock.tick(self.fps)
         self.surface.fill(self.fond_ecran)
 
-    def add_ball(self):
+    def add_ball(self, valeur):
         self.balls.add(
             balle(self.largeur_ecran, self.hauteur_ecran, self.Barre, self.Bricks, self.surface, self.Son_Jeu,
-                  self.angle_base, 10))
+                  valeur.angle, valeur.vitesse))
 
-    def partie(self):
-        hp = 3
-        self.Bricks = bricks(self.surface)
+    def partie(self, valeur):
+        hp = valeur.hp_ball
+        self.Bricks = bricks(self.surface, valeur.hp_brique, valeur.pattern)
         self.Barre = barre(self.surface)
-        self.add_ball()
+        self.add_ball(valeur)
         en_vie = True
-        while en_vie:
+        while en_vie and self.run:
             self.Barre.tp_souris()
 
             for event in pygame.event.get():
@@ -94,26 +97,27 @@ class jeu:
 
             for ball in self.balls:
                 morts = False
-                if ball.mort: morts = ball
+                if ball.mort:
+                    morts = ball
                 else:
                     ball.colibrique()
                     ball.deplacement()
-            if morts: self.balls.discard(morts)
+            if morts:
+                self.balls.discard(morts)
+            self.Barre.affiche()
+
             if self.balls == set():
                 hp -= 1
                 if hp >= 0:
-                    self.add_ball()
+                    self.add_ball(valeur)
                 else:
                     en_vie = False
-            self.Barre.affiche()
-
 
             self.frame()
         self.reset()
 
     def menu_principal(self):
-        en_cours = True
-        while en_cours:
+        while self.run:
             for event in pygame.event.get():
                 if event.type == MOUSEBUTTONDOWN:
                     self.menu.souris.press = True
@@ -121,13 +125,14 @@ class jeu:
                     self.menu.souris.press = False
                 if event.type == QUIT or self.menu.end:
                     self.run = False
-                    en_cours = False
-                if self.menu.jeu:
-                    self.partie()
-                    self.menu.reset()
-                if self.menu.level:
-                    # level_
-                    pass
+            if self.menu.jeu:
+                self.partie()
+                self.menu.reset()
+            if self.menu.level:
+                self.menu_level()
+                self.menu_niveau.reset()
+                self.menu.reset()
+
             self.menu.souris.position()
             self.menu.verif_bouton()
             self.menu.change_texture_bouton()
@@ -136,3 +141,29 @@ class jeu:
             self.menu.click()
             self.frame()
 
+    def menu_level(self):
+        en_cours = True
+        valeur = False
+        while en_cours and self.run:
+            for event in pygame.event.get():
+                if event.type == MOUSEBUTTONDOWN:
+                    self.menu_niveau.souris.press = True
+                else:
+                    self.menu_niveau.souris.press = False
+                if event.type == QUIT:
+                    self.run = False
+                    en_cours = False
+
+            if self.menu_niveau.end:
+                en_cours = False
+
+            if not valeur == False:
+                self.partie(valeur)
+
+            self.menu_niveau.souris.position()
+            self.menu_niveau.verif_bouton()
+            self.menu_niveau.change_texture_bouton()
+            self.menu_niveau.affiche_bouton()
+            self.menu_niveau.affiche_texte()
+            valeur = self.menu_niveau.click()
+            self.frame()

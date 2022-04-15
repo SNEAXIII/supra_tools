@@ -4,7 +4,7 @@ import pygame
 '''Création des briques dans la fenêtre du jeu'''
 class bricks:
 
-    def __init__(self, surface):
+    def __init__(self, surface, hp, pattern):
         self.img = {
             "blue" :pygame.image.load(r"textures\brick\blue_brick.png"),
             "green" :pygame.image.load(r"textures\brick\green_brick.png")
@@ -15,6 +15,8 @@ class bricks:
             "fissure3" : pygame.image.load(r"textures\crack\layer_crack_phase3.png")
                     }
         self.surface = surface
+        self.hp_brique = hp
+        self.pattern_base = self.pattern_actu = pattern
         self.reset_()
 
 
@@ -28,15 +30,13 @@ class bricks:
             for brique in ligne:
                 brique.affiche()
 
-
     def liste_briques(self):
         """création de liste des coordonnées des briques pour l'affichage"""
-        x_base, y_base = 45, 82
-        x_repet, y_repet = 12, 11
-        briques = [[] for _ in range(y_repet)]
-        for y in range(y_repet):
-            for x in range(x_repet): briques[y].append(brick(x_base + x * 90, y_base + y * 28, self.img["blue"], self.surface, 1))
-        return briques
+        liste = self.pattern_actu[::]
+        for y in range(len(self.pattern_actu)):
+            for x in range(len(self.pattern_actu[y])):
+                self.pattern_actu[y][x] = brick(self.pattern_actu[y][x][0], self.pattern_actu[y][x][1], self.img["blue"], self.surface, self.hp_brique)
+        return liste
 
     def __str__(self):
         """affiche la liste des briques dans la console"""
