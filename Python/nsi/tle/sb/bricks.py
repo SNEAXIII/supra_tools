@@ -16,13 +16,16 @@ class bricks:
                     }
         self.surface = surface
         self.hp_brique = hp
-        self.pattern_base = self.pattern_actu = pattern
+        self.pattern_base = pattern
+        self.bricks = [[] for _ in pattern]
         self.reset_()
+
 
 
     def reset_(self):
         """replace toutes briques selon leur situation initiale"""
-        self.bricks = self.liste_briques()
+        self.liste_briques()
+
 
     def dessine_moi(self):
         """affiche les textures de toutes briques à leurs coordonnées"""
@@ -32,11 +35,10 @@ class bricks:
 
     def liste_briques(self):
         """création de liste des coordonnées des briques pour l'affichage"""
-        liste = self.pattern_actu[::]
-        for y in range(len(self.pattern_actu)):
-            for x in range(len(self.pattern_actu[y])):
-                self.pattern_actu[y][x] = brick(self.pattern_actu[y][x][0], self.pattern_actu[y][x][1], self.img["blue"], self.surface, self.hp_brique)
-        return liste
+        for y in range(len(self.pattern_base)):
+            for x in range(len(self.pattern_base[y])):
+                self.bricks[y].append(brick(self.pattern_base[y][x][0], self.pattern_base[y][x][1], self.img["blue"], self.surface, self.hp_brique))
+
 
     def __str__(self):
         """affiche la liste des briques dans la console"""

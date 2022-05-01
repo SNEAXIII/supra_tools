@@ -4,7 +4,8 @@ from barre import barre
 from balls import balle
 from bricks import bricks
 from pygame.locals import *
-from menu import Menu, Menu_Level
+from menu import Menu, Menu_Level, Niveau
+from niveaux import liste_level_0
 
 """
 pygame.init()
@@ -126,19 +127,14 @@ class jeu:
                 if event.type == QUIT or self.menu.end:
                     self.run = False
             if self.menu.jeu:
-                self.partie()
+                self.partie(Niveau(liste_level_0, 7, -2, 45, 1, 0))
                 self.menu.reset()
             if self.menu.level:
                 self.menu_level()
                 self.menu_niveau.reset()
                 self.menu.reset()
 
-            self.menu.souris.position()
-            self.menu.verif_bouton()
-            self.menu.change_texture_bouton()
-            self.menu.affiche_bouton()
-            self.menu.affiche_texte()
-            self.menu.click()
+            self.menu.next_frame()
             self.frame()
 
     def menu_level(self):
@@ -159,11 +155,8 @@ class jeu:
 
             if not valeur == False:
                 self.partie(valeur)
+                self.menu_niveau.reset()
 
-            self.menu_niveau.souris.position()
-            self.menu_niveau.verif_bouton()
-            self.menu_niveau.change_texture_bouton()
-            self.menu_niveau.affiche_bouton()
-            self.menu_niveau.affiche_texte()
+            self.menu_niveau.next_frame()
             valeur = self.menu_niveau.click()
             self.frame()

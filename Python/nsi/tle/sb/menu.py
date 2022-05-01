@@ -69,7 +69,16 @@ class Menu:
             # Quitte la fenêtre Pygame et clos le programme
             self.end = True
 
+    def next_frame(self):
+        self.souris.position()
+        self.verif_bouton()
+        self.change_texture_bouton()
+        self.affiche_bouton()
+        self.affiche_texte()
+        self.click()
+
     def reset(self):
+        self.souris.press = False
         self.end = False
         self.jeu = False
         self.level = False
@@ -123,20 +132,12 @@ class Bouton:
 
     def affiche_texte(self):
         self.surface.blit(self.text, (
-        self.x + (self.taille_x / 2) - (len(self.str) / 2) * 30 - 15, self.y + self.taille_y / 2 - 30))
+            self.x + (self.taille_x / 2) - (len(self.str) / 2) * 30 - 15, self.y + self.taille_y / 2 - 30))
 
 
 # suggestion pour l'affichage de la fenêtre des niveaux
 # toutes les idées en bazar, bonne lecture xD
 ## Class Level
-''' Création de l'orga de la fenêtre niveaux'''
-'''
-(surface, x, y, taille_x, taille_y, textu_petite, textu_grande, texte_afficher, font, pattern de briques ( lst ), vitesse_ball, change_barre)
-level_1 = Level(surface, 90, 45, 385, 115, "bouton_jouer_clear.png", "bouton_jouer_souris.png", "niveau 1", font, lst_lvl_1, 6, Barre.augmente_taile_x(-1)) # level_1.png
-level_2 = Level(surface, 565, 45, 385, 115, "bouton_jouer_clear.png", "bouton_jouer_souris.png", "niveau 2", font, lst_lvl_2, 8, Barre.augmente_taile_x(0)) # level_2.png
-level_3 = Level(surface, 90, 215, 385, 115, "bouton_jouer_clear.png", "bouton_jouer_souris.png", "niveau 3", font, lst_lvl_3, z,  Barre.augmente_taile_x(-2)) # level_3.png
-level_3 = Level(surface, 565, 215, 385, 115, "bouton_jouer_clear.png", "bouton_jouer_souris.png", "niveau 4", font, lst_lvl_4, z,  Barre.augmente_taile_x(-3)) # level_4.png
-'''
 
 
 class Menu_Level:
@@ -144,15 +145,20 @@ class Menu_Level:
     def __init__(self, surface, font, souris):
         self.souris = souris
         self.surface = surface
-        self.retour = Bouton(surface, 347, 538, 385, 115, "bouton_jouer_clear.png", "bouton_jouer_souris.png", "RETOUR", font, souris)
-        self.bouton_level_1 = Bouton(surface, 109, 109, 385, 115, "bouton_jouer_clear.png", "bouton_jouer_souris.png", "niveau 1", font, souris)
-        self.bouton_level_2 = Bouton(surface, 595, 109, 385, 115, "bouton_jouer_clear.png", "bouton_jouer_souris.png", "niveau 2", font, souris)
-        self.bouton_level_3 = Bouton(surface, 109, 323, 385, 115, "bouton_jouer_clear.png", "bouton_jouer_souris.png", "niveau 3", font, souris)
-        self.bouton_level_4 = Bouton(surface, 595, 323, 385, 115, "bouton_jouer_clear.png", "bouton_jouer_souris.png", "niveau 4", font, souris)
-        self.level_1 = Niveau(liste_level_1, 6, -2, 55, 2, 3)
-        self.level_2 = Niveau(liste_level_2, 7, -5, 25, 3, 2)
-        self.level_3 = Niveau(liste_level_3, 8, -6, 45, 3, 2)
-        self.level_4 = Niveau(liste_level_4, 10, -8, 20, 3, 1)
+        self.retour = Bouton(surface, 347, 538, 385, 115, "bouton_jouer_clear.png", "bouton_jouer_souris.png", "RETOUR",
+                             font, souris)
+        self.bouton_level_1 = Bouton(surface, 109, 109, 385, 115, "bouton_jouer_clear.png", "bouton_jouer_souris.png",
+                                     "niveau 1", font, souris)
+        self.bouton_level_2 = Bouton(surface, 595, 109, 385, 115, "bouton_jouer_clear.png", "bouton_jouer_souris.png",
+                                     "niveau 2", font, souris)
+        self.bouton_level_3 = Bouton(surface, 109, 323, 385, 115, "bouton_jouer_clear.png", "bouton_jouer_souris.png",
+                                     "niveau 3", font, souris)
+        self.bouton_level_4 = Bouton(surface, 595, 323, 385, 115, "bouton_jouer_clear.png", "bouton_jouer_souris.png",
+                                     "niveau 4", font, souris)
+        # self.level_1 = Niveau(liste_level_1, 6, -2, 55, 2, 3)
+        # self.level_2 = Niveau(liste_level_2, 7, -5, 25, 3, 2)
+        # self.level_3 = Niveau(liste_level_3, 8, -6, 45, 3, 2)
+        # self.level_4 = Niveau(liste_level_4, 10, -8, 20, 3, 1)
         self.reset()
         self.font = font
 
@@ -161,45 +167,45 @@ class Menu_Level:
         self.bouton_level_2.verif()
         self.bouton_level_3.verif()
         self.bouton_level_4.verif()
-        self.retour.        verif()
+        self.retour.verif()
 
     def change_texture_bouton(self):
         self.bouton_level_1.change_textu()
         self.bouton_level_2.change_textu()
         self.bouton_level_3.change_textu()
         self.bouton_level_4.change_textu()
-        self.retour.        change_textu()
+        self.retour.change_textu()
 
     def affiche_bouton(self):
         self.bouton_level_1.afficher()
         self.bouton_level_2.afficher()
         self.bouton_level_3.afficher()
         self.bouton_level_4.afficher()
-        self.retour.        afficher()
+        self.retour.afficher()
 
     def affiche_texte(self):
         self.bouton_level_1.affiche_texte()
         self.bouton_level_2.affiche_texte()
         self.bouton_level_3.affiche_texte()
         self.bouton_level_4.affiche_texte()
-        self.retour.        affiche_texte()
+        self.retour.affiche_texte()
 
     def click(self):
         if self.bouton_level_1.click():
             # Lance le jeu avec les paramètres choisis
-            return self.level_1
+            return Niveau(liste_level_1, 6, -2, 55, 2, 3)
 
         elif self.bouton_level_2.click():
             # Lance le jeu avec les paramètres choisis
-            return self.level_2
+            return Niveau(liste_level_2, 7, -5, 25, 3, 2)
 
         elif self.bouton_level_3.click():
             # Lance le jeu avec les paramètres choisis
-            return self.level_3
+            return Niveau(liste_level_3, 8, -6, 45, 3, 2)
 
         elif self.bouton_level_4.click():
             # Lance le jeu avec les paramètres choisis
-            return self.level_4
+            return Niveau(liste_level_4, 10, -8, 20, 3, 1)
 
         elif self.retour.click():
             # Retourne sur le menu de base
@@ -209,8 +215,16 @@ class Menu_Level:
         else:
             return False
 
+    def next_frame(self):
+        self.souris.position()
+        self.verif_bouton()
+        self.change_texture_bouton()
+        self.affiche_bouton()
+        self.affiche_texte()
+
     def reset(self):
         self.end = False
+        self.souris.press = False
 
 
 class Niveau:
