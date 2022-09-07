@@ -1,8 +1,12 @@
 import pygame
 from niveaux import liste_level_0, liste_level_1, liste_level_2, liste_level_3, liste_level_4
 
+b_clear = r"textures\bouton_jouer_clear.png"
+b_souris = r"textures\bouton_jouer_souris.png"
 
 class souris:
+
+    '''permet d'obtenir la position de la souris à chaque frame'''
     def __init__(self):
         self.press = False
         self.position()
@@ -16,40 +20,48 @@ class souris:
 
 
 class Menu:
-
+    '''
+    souris = coordonnées de la souris
+    jouer/levels/credits/quitter = création des boutons avec la classe Bouton
+    font = définition de la police utilisé pour les boutons
+    '''
     def __init__(self, surface, font, souris):
         self.souris = souris
         self.surface = surface
-        self.jouer = Bouton(surface, 350, 261, 385, 115, "bouton_jouer_clear.png", "bouton_jouer_souris.png",
+        self.jouer = Bouton(surface, 350, 261, 385, 115, b_clear, b_souris,
                             "JOUER", font, self.souris)
-        self.levels = Bouton(surface, 350, 413, 385, 115, "bouton_jouer_clear.png", "bouton_jouer_souris.png",
+        self.levels = Bouton(surface, 350, 413, 385, 115, b_clear, b_souris,
                              "NIVEAUX", font, self.souris)
-        self.credits = Bouton(surface, 20, 585, 385, 115, "bouton_jouer_clear.png", "bouton_jouer_souris.png",
+        self.credits = Bouton(surface, 20, 585, 385, 115, b_clear, b_souris,
                               "CREDITS", font, self.souris)
-        self.quitter = Bouton(surface, 675, 585, 385, 115, "bouton_jouer_clear.png", "bouton_jouer_souris.png",
+        self.quitter = Bouton(surface, 675, 585, 385, 115, b_clear, b_souris,
                               "QUITTER", font, self.souris)
         self.font = font
         self.reset()
 
     def verif_bouton(self):
+        '''verifie si la souris se trouve dans le bouton correspondant'''
         self.jouer.verif()
         self.credits.verif()
         self.levels.verif()
         self.quitter.verif()
 
     def change_texture_bouton(self):
+        '''change la texture de bouton lorsque la souris survole le bouton'''
         self.jouer.change_textu()
         self.credits.change_textu()
         self.levels.change_textu()
         self.quitter.change_textu()
 
     def affiche_bouton(self):
+        '''affiche les boutons dans la fenêtre pygame'''
         self.jouer.afficher()
         self.credits.afficher()
         self.levels.afficher()
         self.quitter.afficher()
 
     def affiche_texte(self):
+        '''affiche le texte sur chaque bouton'''
         self.jouer.affiche_texte()
         self.levels.affiche_texte()
         self.credits.affiche_texte()
@@ -61,7 +73,7 @@ class Menu:
             self.jeu = True
         elif self.credits.click():
             # Afficher l'image des crédits
-            pass
+            self.credit = True
         elif self.levels.click():
             # Afficher les boutons des niveaux
             self.level = True
@@ -70,6 +82,7 @@ class Menu:
             self.end = True
 
     def next_frame(self):
+        '''actualise l'affichage'''
         self.souris.position()
         self.verif_bouton()
         self.change_texture_bouton()
@@ -78,10 +91,12 @@ class Menu:
         self.click()
 
     def reset(self):
+        '''remet à 0 chaque bouton'''
         self.souris.press = False
         self.end = False
         self.jeu = False
         self.level = False
+        self.credit = False
 
 
 ## Class Bouton
@@ -90,6 +105,13 @@ class Menu:
 
 class Bouton:
 
+    '''
+    image simple = texture de base du bouton
+    image souris = texture lorsque la souris survole le bouton
+    str = texte à afficher dans le bouton
+    text = définition de la la font de la taille et du style de l'écriture
+    souris_dedans = True quand la souris est dans le bouton dans la fenêtre
+    '''
     def __init__(self, surface, x, y, taille_x, taille_y, image_simple, image_souris, texte, font, souris):
         self.surface = surface
         self.x = x
@@ -104,7 +126,6 @@ class Bouton:
         self.souris = souris
 
     def __str__(self):
-        '''affiche rien'''
         return f"{self.text} -> {self.x} , {self.y}"
 
     def afficher(self):
@@ -127,34 +148,35 @@ class Bouton:
             self.image_actuelle = self.image_simple
 
     def click(self):
+        '''retourne True si la souris clique dans le bouton'''
         if self.souris.press and self.souris_dedans:
             return True
 
     def affiche_texte(self):
-        self.surface.blit(self.text, (
-            self.x + (self.taille_x / 2) - (len(self.str) / 2) * 30 - 15, self.y + self.taille_y / 2 - 30))
+        '''affiche le texte du bouton par dessus le bouton'''
+        self.surface.blit(self.text, (self.x + (self.taille_x / 2) - (len(self.str) / 2) * 30 - 15, self.y + self.taille_y / 2 - 30))
 
 
-# suggestion pour l'affichage de la fenêtre des niveaux
-# toutes les idées en bazar, bonne lecture xD
 ## Class Level
-
 
 class Menu_Level:
 
+    '''
+    retour/btnlevel1/level2/level3/level4 = création des boutons avec la classe bouton
+    '''
     def __init__(self, surface, font, souris):
         self.souris = souris
         self.surface = surface
-        self.retour = Bouton(surface, 347, 538, 385, 115, "bouton_jouer_clear.png", "bouton_jouer_souris.png", "RETOUR",
+        self.retour = Bouton(surface, 347, 538, 385, 115, b_clear, b_souris, "RETOUR",
                              font, souris)
-        self.bouton_level_1 = Bouton(surface, 109, 109, 385, 115, "bouton_jouer_clear.png", "bouton_jouer_souris.png",
-                                     "niveau 1", font, souris)
-        self.bouton_level_2 = Bouton(surface, 595, 109, 385, 115, "bouton_jouer_clear.png", "bouton_jouer_souris.png",
-                                     "niveau 2", font, souris)
-        self.bouton_level_3 = Bouton(surface, 109, 323, 385, 115, "bouton_jouer_clear.png", "bouton_jouer_souris.png",
-                                     "niveau 3", font, souris)
-        self.bouton_level_4 = Bouton(surface, 595, 323, 385, 115, "bouton_jouer_clear.png", "bouton_jouer_souris.png",
-                                     "niveau 4", font, souris)
+        self.bouton_level_1 = Bouton(surface, 109, 109, 385, 115, b_clear, b_souris,
+                                     "Niveau 1", font, souris)
+        self.bouton_level_2 = Bouton(surface, 595, 109, 385, 115, b_clear, b_souris,
+                                     "Niveau 2", font, souris)
+        self.bouton_level_3 = Bouton(surface, 109, 323, 385, 115, b_clear, b_souris,
+                                     "Niveau 3", font, souris)
+        self.bouton_level_4 = Bouton(surface, 595, 323, 385, 115, b_clear, b_souris,
+                                     "Niveau 4", font, souris)
         # self.level_1 = Niveau(liste_level_1, 6, -2, 55, 2, 3)
         # self.level_2 = Niveau(liste_level_2, 7, -5, 25, 3, 2)
         # self.level_3 = Niveau(liste_level_3, 8, -6, 45, 3, 2)
@@ -163,6 +185,7 @@ class Menu_Level:
         self.font = font
 
     def verif_bouton(self):
+        '''verifie si la souris est dans chaque bouton'''
         self.bouton_level_1.verif()
         self.bouton_level_2.verif()
         self.bouton_level_3.verif()
@@ -170,6 +193,7 @@ class Menu_Level:
         self.retour.verif()
 
     def change_texture_bouton(self):
+        '''modifie la textu du bouton si la souris est dedans'''
         self.bouton_level_1.change_textu()
         self.bouton_level_2.change_textu()
         self.bouton_level_3.change_textu()
@@ -177,6 +201,7 @@ class Menu_Level:
         self.retour.change_textu()
 
     def affiche_bouton(self):
+        '''affiche chaque bouton'''
         self.bouton_level_1.afficher()
         self.bouton_level_2.afficher()
         self.bouton_level_3.afficher()
@@ -184,6 +209,7 @@ class Menu_Level:
         self.retour.afficher()
 
     def affiche_texte(self):
+        '''affiche le texte par dessus chaque bouton'''
         self.bouton_level_1.affiche_texte()
         self.bouton_level_2.affiche_texte()
         self.bouton_level_3.affiche_texte()
@@ -191,6 +217,10 @@ class Menu_Level:
         self.retour.affiche_texte()
 
     def click(self):
+        '''
+        intialise chaque paramètres de jeu en fonction du bouton de jeu cliqué
+        retourne sur le menu principal si le bouton retour est cliqué
+        '''
         if self.bouton_level_1.click():
             # Lance le jeu avec les paramètres choisis
             return Niveau(liste_level_1, 6, -2, 55, 2, 3)
@@ -229,6 +259,10 @@ class Menu_Level:
 
 class Niveau:
 
+    '''
+    définition de chaque paramètre des niveaux, la forme des briques, la vitesse de la balle,
+    la variation de la barre, l'angle de la balle au départ, la vie des briques et le nombre de vie du joueur
+    '''
     def __init__(self, pattern, vitesse_ball, change_barre, angle_depart, hp_brique, hp):
         self.pattern = pattern
         self.vitesse = vitesse_ball

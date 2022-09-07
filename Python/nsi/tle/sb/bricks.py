@@ -4,6 +4,13 @@ import pygame
 '''Création des briques dans la fenêtre du jeu'''
 class bricks:
 
+    '''
+    img = chargement des images utilisables pour les textures des bricks en jeu
+    fissure = chargement des images overlays pour les cassures des bricks
+    hp_brique = nombre de choc avec la balle avant que la brique soit cassé
+    pattern_base = liste de 0 et de 1 en fonction de l'existance de brique à chaque coordonnée
+    self.bricks = création de la liste utilisable pour le code du pattern
+    '''
     def __init__(self, surface, hp, pattern):
         self.img = {
             "blue" :pygame.image.load(r"textures\brick\blue_brick.png"),
@@ -17,7 +24,7 @@ class bricks:
         self.surface = surface
         self.hp_brique = hp
         self.pattern_base = pattern
-        self.bricks = [[] for _ in pattern]
+        self.bricks = [[],[],[],[],[],[],[],[],[],[],[]]
         self.reset_()
 
 
@@ -33,12 +40,15 @@ class bricks:
             for brique in ligne:
                 brique.affiche()
 
-    def liste_briques(self):
-        """création de liste des coordonnées des briques pour l'affichage"""
-        for y in range(len(self.pattern_base)):
-            for x in range(len(self.pattern_base[y])):
-                self.bricks[y].append(brick(self.pattern_base[y][x][0], self.pattern_base[y][x][1], self.img["blue"], self.surface, self.hp_brique))
 
+    def liste_briques(self):
+        x_base = 45
+        y_base = 82
+        for a in range(len(self.pattern_base)):
+            for b in range(len(self.pattern_base[a])):
+                if self.pattern_base[a][b] == 1:
+                    self.bricks[a].append(brick(x_base + 90*b, y_base + 28*a, self.img["blue"], self.surface, self.hp_brique))
+        return self.bricks
 
     def __str__(self):
         """affiche la liste des briques dans la console"""
@@ -48,6 +58,14 @@ class bricks:
                 str_ += f"{brique.x, brique.y} "
             str_ += "\n"
         return str_
+
+    def __len__(self):
+        """affiche les textures de toutes briques à leurs coordonnées"""
+        len = 0
+        for ligne in self.bricks:
+            for brique in ligne:
+                len += brique.alive
+        return len
 
 ## Class Brick
 """définition d'une brique avec sa texture, ces variations et sa position"""
@@ -64,25 +82,26 @@ class brick:
         self.y_max = self.y + self.taille_y
         self.hp = self.max_hp = hp
         self.en_vie = True
-        self.coul = (0, 255, 0)
         self.img = img
         self.surface = surface
         self.layer_cassure = None
-
-    def ch_coul(self):
-        '''jsp'''
-        self.coul = (0, 0, 255)
+        self.alive = 1
 
     def hp_add(self, nb):
         '''actualise le nombre de points de vie que possède la brique et retourne False si elle n'a plus de vie'''
-        if self.en_vie: self.hp += nb
-        if self.hp < 1: self.en_vie = False
+        if self.en_vie:
+            self.hp += nb
+        if self.hp < 1:
+            self.en_vie = False
+            self.alive = 0
 
     def kill(self):
         '''tue la brique'''
         self.en_vie = False
+        self.alive = 0
 
     def cassure(self, liste_fissure):
+        '''application des différentes textures de fissures sur les briques après un choc avec la balle'''
         if self.en_vie :
             if (self.max_hp//3)*2 < self.hp <= self.max_hp :
                 self.layer_cassure = liste_fissure["fissure1"]
@@ -92,6 +111,7 @@ class brick:
                 self.layer_cassure = liste_fissure["fissure3"]
 
     def affiche(self):
+        '''affiche les textures des briques si elles sont encore "vivante" ( self.hp_brique positif )'''
         if self.en_vie:
             self.surface.blit(self.img, (self.x - self.taille_x, self.y - self.taille_y))
             if not self.layer_cassure is None:

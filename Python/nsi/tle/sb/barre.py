@@ -4,12 +4,19 @@ import pygame
 '''définition de la barre du joueur dans la fenêtre du jeu'''
 
 class barre:
+    '''
+    x / y = coordonnées d'origine en X et Y dans la fenêtre
+    taille_x / taille_y = longueur et largeur de la barre depuis le point d'origine (x,y)
+    taille_x_mini / taille_x_maxi = longueur x minimum et maximum de la barre depuis l'origine (x,y)
+    img_gauche / img_droite = chargement des textures des deux cotés de la barre
+    '''
+
     def __init__(self,  surface):
         self.x = 1080 / 2
         self.y = 660
         self.taille_x = self.taille_x_base = 75
         self.taille_y = 5
-        self.taille_x_mini = 40
+        self.taille_x_mini = 35
         self.taille_x_maxi = 150
         self.surface = surface
         self.img_gauche = pygame.image.load(r"textures\stick\left_player_stick.png")

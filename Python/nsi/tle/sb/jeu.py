@@ -7,39 +7,10 @@ from pygame.locals import *
 from menu import Menu, Menu_Level, Niveau
 from niveaux import liste_level_0
 
-"""
-pygame.init()
-run = True
-fps = 60
-fpsClock = pygame.time.Clock()
-rouge = (255, 0, 0)
-coul_barre = (237, 190, 82)
-noir = (0, 0, 0)
-largeur, hauteur = 1080, 720
-surface = pygame.display.set_mode((largeur, hauteur))
-# Définition des briques
-Bricks = bricks(surface, r"textures\brick\blue_brick.png")
-# Définition de la barre
-Barre = barre(surface, (r"textures\stick\left_player_stick.png", r"textures\stick\right_player_stick.png"))
-# Définition de la balle
-balls = set()
-angle_base = 45
-click = False
-
-font = pygame.font.SysFont('Linux Biolinum G',55)
-menu = Menu(surface,font)
-
-# Boucle du jeu
-Son_Jeu = son_jeu()
-print(Bricks)
-morts = False
-menu_ = True # lance le menu
-jeu_ = False # lance le jeu
-level_ = False # lance le menu des niveaux
-"""
-
 
 class souris:
+    '''calcul les coordonnées de la souris dans la fenêtre à chaque frame'''
+
     def __init__(self):
         self.press = False
         self.position()
@@ -49,6 +20,16 @@ class souris:
 
 
 class jeu:
+    '''
+    fps = nombre de frame par seconde
+    fond écran = définition du fond de la fenêtre pygame
+    fpsclock = définie le nombre d'image par seconde de la fenêtre
+    angle_base = angle de la balle au lancement
+    son_jeu = utilise le fichier sons pour lancer l'instance de pygame des sons
+    menu = appel de la classe Menu
+    background = définition de l'arrière plan du jeu
+    '''
+
     def __init__(self):
         self.run = True
         self.fps = 60
@@ -63,6 +44,7 @@ class jeu:
         self.menu = Menu(self.surface, self.font, souris())
         self.menu_niveau = Menu_Level(self.surface, self.font, souris())
         self.reset()
+        self.background = pygame.image.load(r"textures\wallpaper.png")
 
     def reset(self):
         self.Bricks = None
@@ -70,23 +52,30 @@ class jeu:
         self.balls = set()
 
     def frame(self):
+        '''actualise les éléments du jeu chaque frame ( 60 par seconde en l'occurence )'''
         self.Son_Jeu.joue()
         pygame.display.flip()
         self.fpsClock.tick(self.fps)
-        self.surface.fill(self.fond_ecran)
+        self.surface.blit(self.background, (0, 0))
 
     def add_ball(self, valeur):
+        '''définition des paramètres de la balle'''
         self.balls.add(
             balle(self.largeur_ecran, self.hauteur_ecran, self.Barre, self.Bricks, self.surface, self.Son_Jeu,
-                  valeur.angle, valeur.vitesse))
+                  valeur.angle, valeur.vitesse, valeur.taille_barre))
 
     def partie(self, valeur):
+        '''lance la partie de jeu avec les paramètres nécessaires'''
         hp = valeur.hp_ball
         self.Bricks = bricks(self.surface, valeur.hp_brique, valeur.pattern)
         self.Barre = barre(self.surface)
         self.add_ball(valeur)
         en_vie = True
-        while en_vie and self.run:
+        nb = last_nb = len(self.Bricks)
+        p1, p2, p3, p4 = nb // 5, nb // 5 * 2, nb // 5 * 3, nb // 5 * 4
+
+        while en_vie:
+            nb = len(self.Bricks)
             self.Barre.tp_souris()
 
             for event in pygame.event.get():
@@ -113,11 +102,28 @@ class jeu:
                     self.add_ball(valeur)
                 else:
                     en_vie = False
+            if nb == 0:
+                en_vie = False
+            else:
+                if nb == p1 and not last_nb == p1:
+                    last_nb = p1
+                    self.add_ball(valeur), self.add_ball(valeur)
+                elif nb == p2 and not last_nb == p2:
+                    last_nb = p2
+                    self.add_ball(valeur), self.add_ball(valeur)
+                elif nb == p3 and not last_nb == p3:
+                    last_nb = p3
+                    self.add_ball(valeur), self.add_ball(valeur)
+                elif nb == p4 and not last_nb == p4:
+                    last_nb = p4
+                    self.add_ball(valeur), self.add_ball(valeur)
 
+            self.surface.blit(self.font.render(f"{hp}", True, (0, 0, 255)), (0, 0))
             self.frame()
         self.reset()
 
     def menu_principal(self):
+        '''contrôle l'execution du menu principal avant le lancement d'une partie ou d'un autre menu'''
         while self.run:
             for event in pygame.event.get():
                 if event.type == MOUSEBUTTONDOWN:
@@ -133,11 +139,19 @@ class jeu:
                 self.menu_level()
                 self.menu_niveau.reset()
                 self.menu.reset()
+            if self.menu.credit:
+                self.background = pygame.image.load(r"textures\credits.png")
+                while self.run:
+                    for event in pygame.event.get():
+                        if event.type == QUIT:
+                            self.run = False
+                    self.frame()
 
             self.menu.next_frame()
             self.frame()
 
     def menu_level(self):
+        '''execute le menu level et affiche les boutons nécessaires'''
         en_cours = True
         valeur = False
         while en_cours and self.run:
